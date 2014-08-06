@@ -1,0 +1,76 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.3'
+    }
+}
+
+apply plugin: 'bintray'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+group = 'com.ofg'
+description = '' // TODO: Change
+version = '0.0.1'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile gradleApi()
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.2'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-1.8'
+    testCompile 'com.github.tomakehurst:wiremock:1.46'
+    testRuntime 'cglib:cglib-nodep:2.2.2'
+    testRuntime 'org.objenesis:objenesis:1.2'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
+bintrayUpload.dependsOn 'build'
+
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar {
+                classifier "sources"
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.properties['bintrayUser']
+    key = System.properties['bintrayKey']
+    publications = ['plugin']
+    pkg {
+        repo = 'micro'
+        userOrg = '4finance' 
+        name = 'micro-deps-gradle-plugin'
+        desc = 'Gradle plugin that allows you to run / stop stubs for your microservice.' // TODO: Change
+        licenses = ['Apache-2.0']
+        labels = ['gradle', 'microservice']
+    } 
+}
+
+task sourcesJar(type: Jar, dependsOn:classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
