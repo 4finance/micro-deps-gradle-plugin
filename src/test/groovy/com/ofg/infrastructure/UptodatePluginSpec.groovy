@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*
+import static com.ofg.infrastructure.StubRunnerPlugin.MOCK_DEPS_CONFIGURATION_NAME
 import static com.ofg.infrastructure.StubRunnerPlugin.RUN_MOCKS_TASK_NAME
 import static com.ofg.infrastructure.StubRunnerPlugin.STOP_MOCKS_TASK_NAME
 
@@ -30,6 +31,11 @@ class UptodatePluginSpec extends WireMockSpec {
             executeStopMocksTask()
         then:
             wireMock.verifyThat(getRequestedFor(urlEqualTo('/stop')))
+    }
+
+    def 'should have mockDependencies configuration created'() {
+        expect:
+            project.configurations.getByName(MOCK_DEPS_CONFIGURATION_NAME)
     }
 
     private void executeStopMocksTask() {
