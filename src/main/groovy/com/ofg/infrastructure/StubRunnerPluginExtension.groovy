@@ -27,7 +27,7 @@ class StubRunnerPluginExtension {
     String stubContainingRepositoryUrl
 
     /**
-     * 
+     * File pointing to the JSON configuration of your microservice
      */
     File microserviceJson 
 }

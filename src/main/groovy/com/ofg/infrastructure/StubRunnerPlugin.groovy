@@ -1,6 +1,7 @@
 package com.ofg.infrastructure
 
 import groovy.util.logging.Slf4j
+import groovyx.net.http.HTTPBuilder
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -13,13 +14,15 @@ import javax.inject.Inject
  * 1. Add mockDependencies configuration
  * 2. Add micro-deps version property to extension
  *      a. If not provided download latest version
- * 3. Add zookeeperport, zookeepermockport, repositoryurl to extension
- *      a. Add support for passing filepath to microservices.json(optional)
- * 4. Add runMocks and stopMocks tasks
+ * 3. Add runMocks tasks
  */
 @Slf4j
 class StubRunnerPlugin implements Plugin<Project> {
-    static final String EXTENSION_NAME = 'stubRunner'
+    public static final String EXTENSION_NAME = 'stubRunner'
+    public static final String RUN_MOCKS_TASK_NAME = 'runMocks'
+    public static final String STOP_MOCKS_TASK_NAME = 'stopMocks'
+
+    private final LoggerProxy loggerProxy
 
     @Inject
     StubRunnerPlugin() {
@@ -33,31 +36,24 @@ class StubRunnerPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.extensions.create(EXTENSION_NAME, StubRunnerPluginExtension)
-        project.task(EXTENSION_NAME) << { Task task ->
-            NewVersionFinder newVersionFinder = new MavenNewVersionFinder(project.extensions.uptodate)
-            List<Dependency> dependencies = getDependencies(project)
-            List<Dependency> dependenciesWithNewVersions = newVersionFinder.findNewer(dependencies)
-            if (dependenciesWithNewVersions.isEmpty()) {
-                loggerProxy.info(task.logger, NO_NEW_VERSIONS_MESSAGE)
-            } else {
-                loggerProxy.warn(task.logger, NEW_VERSIONS_MESSAGE_HEAD + dependenciesWithNewVersions.join('\n'))
-            }
+        appendRunMocksTask(project)
+        appendStopMocksTask(project)
+    }
+
+    private void appendRunMocksTask(Project project) {
+        project.task(RUN_MOCKS_TASK_NAME) << { Task task ->
+
         }
     }
 
-    private List<Dependency> getDependencies(Project project) {
-        ConfigurationFilter configurationFilter = new ConfigurationFilter(project)
-        Set<Configuration> configurations = configurationFilter.getConfigurations(project.extensions.uptodate.configurations)
-        return getDependencies(configurations)
+    private void appendStopMocksTask(Project project) {
+        project.task(STOP_MOCKS_TASK_NAME) << { Task task ->
+            Integer zookeperPort = project.extensions.stubRunner.zookeeperPort
+            String stopMocksUrl = "http://localhost:$zookeperPort/stop"
+            task.logger.info("Stopping mocks by calling $stopMocksUrl")
+            new HTTPBuilder(stopMocksUrl).get([:])
+            task.logger.info("Mocks stopped successfully")
+        }
     }
 
-    private List<Dependency> getDependencies(Set<Configuration> configurations) {
-        log.debug("Getting dependencies for configurations [$configurations]")
-        return configurations.collectNested { conf ->            
-            conf.dependencies.collect { dep ->
-                log.debug("Collecting dependency with group: [$dep.group] name: [$dep.name] and version: [$dep.version]")    
-                new Dependency(dep.group, dep.name, dep.version) 
-            }
-        }.flatten().unique()
-    }
 }
