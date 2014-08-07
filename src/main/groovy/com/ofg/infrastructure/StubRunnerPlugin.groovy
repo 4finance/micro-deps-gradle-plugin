@@ -15,6 +15,7 @@ import javax.inject.Inject
  * TODO:
  * 1. Add micro-deps version property to extension
  *      a. If not provided download latest version
+ * 2. Add tasks description and add them to a group
  */
 @Slf4j
 class StubRunnerPlugin implements Plugin<Project> {
@@ -22,6 +23,7 @@ class StubRunnerPlugin implements Plugin<Project> {
     protected static final String RUN_MOCKS_TASK_NAME = 'runMocks'
     protected static final String STOP_MOCKS_TASK_NAME = 'stopMocks'
     protected static final String MOCK_DEPS_CONFIGURATION_NAME = 'mockDependencies'
+    protected static final String MICROSERVICE_GROUP_NAME = 'microservice'
 
     private final LoggerProxy loggerProxy
     private final CommandExecutor commandExecutor
@@ -66,6 +68,8 @@ class StubRunnerPlugin implements Plugin<Project> {
 
     private void appendRunMocksTask(Project project) {
         project.task(RUN_MOCKS_TASK_NAME) << { Task task ->
+            task.group = MICROSERVICE_GROUP_NAME
+            task.description = 'Task that downloads micro-deps fat jar, grabs stub dependencies from the provided repository and starts local Zookeeper and stubs'
             Integer zookeperPort = project.extensions.stubRunner.zookeeperPort
             Integer serviceStoppingPort = project.extensions.stubRunner.serviceStoppingPort
             String stubRepositoryUrl = project.extensions.stubRunner.stubContainingRepositoryUrl
