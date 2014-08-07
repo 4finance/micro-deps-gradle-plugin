@@ -1,5 +1,4 @@
 package com.ofg.infrastructure
-
 import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
 import groovyx.net.http.HTTPBuilder
@@ -7,7 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Dependency
-import org.gradle.api.plugins.GroovyPlugin
+import org.gradle.api.plugins.JavaPlugin
 
 import javax.inject.Inject
 
@@ -45,7 +44,7 @@ class StubRunnerPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        applyGroovyPlugin(project)
+        applyJavaPlugin(project)
         createExtensionForPlugin(project)
         createMockDependenciesConfiguration(project)
         addMicroDepsDependencyToProject(project)
@@ -53,9 +52,9 @@ class StubRunnerPlugin implements Plugin<Project> {
         appendStopMocksTask(project)
     }
 
-    private void applyGroovyPlugin(Project project) {
-        log.debug('Applying Groovy plugin')
-        project.plugins.apply(GroovyPlugin)
+    private void applyJavaPlugin(Project project) {
+        log.debug('Applying Java plugin')
+        project.plugins.apply(JavaPlugin)
     }
 
     private void createExtensionForPlugin(Project project) {
