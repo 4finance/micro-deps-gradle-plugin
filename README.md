@@ -1,7 +1,11 @@
+### Current build status
+
+[![Build Status](https://travis-ci.org/4finance/micro-deps-gradle-plugin.svg?branch=master)](https://travis-ci.org/4finance/micro-deps-gradle-plugin)
+
 micro-deps-gradle-plugin
 ======================
 
-Gradle plugin that adds run/stub mocks tasks and proper configrations to your projects
+Gradle plugin that adds run/stub mocks tasks and proper configurations to your project
 
 ### How it works?
 
@@ -9,7 +13,7 @@ The plugin does the following things:
 
 * applies **'java' plugin** if it hasn't been done so already
 * creates **'stubrunner' extension**
-* adds **'stubrunner'** configuration** if it hasn't been done so already
+* adds **'mockDependencies'** configuration** if it hasn't been done so already
 * adds **'com.ofg:micro-deps:VERSION:fatJar'** dependency as follows 
 (VERSION can be passed either from extension or latest will be chosen):
 ```
@@ -32,7 +36,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.ofg:micro-deps-gradle-plugin:0.0.1'
+        classpath 'com.ofg:micro-deps-gradle-plugin:0.0.2'
     }
 }
 ```
@@ -89,11 +93,6 @@ stubRunner {
     microserviceJson // TODO: not yet implemented :)
 }
 ```
-
-### Current build status
-
-[![Build Status](https://travis-ci.org/4finance/micro-deps-gradle-plugin.svg?branch=master)](https://travis-ci.org/4finance/micro-deps-gradle-plugin)
-
 
 ### Changelog
 
