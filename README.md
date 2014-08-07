@@ -1,7 +1,7 @@
 micro-deps-gradle-plugin
 ======================
 
-Description
+Gradle plugin that adds run/stub mocks tasks and proper configrations to your projects
 
 ### How it works?
 
