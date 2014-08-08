@@ -17,7 +17,7 @@ apply plugin: 'uptodate'
 
 group = 'com.ofg'
 description = 'Gradle plugin that adds run/stub mocks tasks and proper configurations to your project'
-version = '0.0.2'
+version = '0.0.3-SNAPSHOT'
 
 sourceCompatibility = 1.7
 
