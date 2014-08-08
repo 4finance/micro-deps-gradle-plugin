@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.3'
+        classpath 'com.ofg:uptodate-gradle-plugin:+'
     }
 }
 
@@ -12,6 +13,7 @@ apply plugin: 'bintray'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'uptodate'
 
 group = 'com.ofg'
 description = 'Gradle plugin that adds run/stub mocks tasks and proper configurations to your project'
