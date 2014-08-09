@@ -21,6 +21,7 @@ class StubRunnerPlugin implements Plugin<Project> {
     @PackageScope static final String MICRO_DEPS_GROUP_NAME = 'com.ofg'
     @PackageScope static final String MICRO_DEPS_ARTIFACT_NAME = 'micro-deps'
     @PackageScope static final String FAT_JAR_SUFFIX = 'fatJar'
+    private static final int OK_PROCESS_EXIT_VALUE = 0
 
     private final LoggerProxy loggerProxy
     private final CommandExecutor commandExecutor
@@ -57,6 +58,10 @@ class StubRunnerPlugin implements Plugin<Project> {
         project.plugins.apply(JavaPlugin)
     }
 
+    private void appendMicroDepsFatJar(Project project) {
+        project.dependencies.add(MOCK_DEPS_CONFIGURATION_NAME, "com.ofg:micro-deps:${project.extensions.stubRunner.microDepsVersion}:fatJar")
+    }
+
     private void createExtensionForPlugin(Project project) {
         log.debug("Creating $StubRunnerPluginExtension extension")
         project.extensions.create(EXTENSION_NAME, StubRunnerPluginExtension)
@@ -68,17 +73,7 @@ class StubRunnerPlugin implements Plugin<Project> {
     }
 
     private void addMicroDepsDependencyToProject(Project project) {
-        project.gradle.projectsEvaluated {
-            log.debug("Checking if artifact with group: [$MICRO_DEPS_GROUP_NAME] and name: [$MICRO_DEPS_ARTIFACT_NAME] is present")
-            Dependency microDepsDependency = project.configurations.mockDependencies.allDependencies.find {
-                it.group == MICRO_DEPS_GROUP_NAME && it.name == MICRO_DEPS_ARTIFACT_NAME
-            }
-            if (!microDepsDependency) {
-                String stubRunnerMicroDepsVersion = project.extensions.stubRunner.microDepsVersion
-                log.debug("Artifact is not present - adding version [$stubRunnerMicroDepsVersion] from extension")
-                project.dependencies.mockDependencies("$MICRO_DEPS_GROUP_NAME:$MICRO_DEPS_ARTIFACT_NAME:$stubRunnerMicroDepsVersion:$FAT_JAR_SUFFIX")
-            }
-        }
+        project.dependencies.add(MOCK_DEPS_CONFIGURATION_NAME, "com.ofg:micro-deps:${project.extensions.stubRunner.microDepsVersion}:fatJar")
     }
 
     private void appendRunMocksTask(Project project) {
@@ -94,7 +89,11 @@ class StubRunnerPlugin implements Plugin<Project> {
                 task.logger.error(WRONG_PARAMS_EXCEPTION_MESSAGE)
                 throw new WrongMicroDepsExecutionParams("$WRONG_PARAMS_EXCEPTION_MESSAGE Your command looked like this [$runMocksCommand]")
             }
-            commandExecutor.execute(runMocksCommand)
+            Process process = commandExecutor.execute(runMocksCommand)
+            int processExitValue = commandExecutor.waitForAndLogProcessOutput(process)
+            if (processExitValue != OK_PROCESS_EXIT_VALUE) {
+                throw new MicroDepsProcessExecutionException()
+            }
         }
         createdTask.group = MICROSERVICE_GROUP_NAME
         createdTask.description = 'Downloads micro-deps fat jar, grabs stub dependencies from the provided repository and starts local Zookeeper and stubs'
