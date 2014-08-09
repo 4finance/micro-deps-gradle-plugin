@@ -40,7 +40,7 @@ class StubRunnerPluginSpec extends WireMockSpec {
 
     def "should execute 'java -jar ...' command when executing runMocks task"() {
         given:
-            setupProperParams()
+            def(microDepsFatJarName, zookeeperPort, serviceStoppingPort, temporaryFile, stubContainingRepositoryUrl) = setupProperParams()
         when:
             executeRunMocksTask()
         then:
@@ -93,7 +93,7 @@ class StubRunnerPluginSpec extends WireMockSpec {
             StackTraceUtils.extractRootCause(thrownException).class == MicroDepsProcessExecutionException
     }
 
-    private void setupProperParams() {
+    private List setupProperParams() {
         File temporaryFile = temporaryFolder.newFile()
         String microDepsFatJarName = 'micro-deps-fat-jar.jar'
         Integer zookeeperPort = getHttpServerPort()
@@ -103,6 +103,7 @@ class StubRunnerPluginSpec extends WireMockSpec {
         project.extensions.stubRunner.stubContainingRepositoryUrl = stubContainingRepositoryUrl
         configurationFinder.findMicroserviceMetaData(project) >> temporaryFile
         dependenciesFinder.getMicroDepsFatJarName(project) >> microDepsFatJarName
+        return [microDepsFatJarName, zookeeperPort, serviceStoppingPort, temporaryFile, stubContainingRepositoryUrl]
     }
 
     private void executeStopMocksTask() {
