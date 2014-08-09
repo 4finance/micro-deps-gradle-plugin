@@ -2,7 +2,11 @@ package com.ofg.infrastructure
 
 class CommandExecutor {
     Process execute(String command) {
-        return command.execute()
+        Process process = command.execute()
+        addShutdownHook {
+            process.destroy()
+        }
+        return process
     }
 
     int waitForAndLogProcessOutput(Process process) {
@@ -13,4 +17,6 @@ class CommandExecutor {
         if (err) println "err:\n$err"
         return process.exitValue()
     }
+
+
 }

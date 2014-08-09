@@ -1,11 +1,11 @@
 package com.ofg.infrastructure
+
 import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
 import groovyx.net.http.HTTPBuilder
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.artifacts.Dependency
 import org.gradle.api.plugins.JavaPlugin
 
 import javax.inject.Inject
@@ -18,9 +18,6 @@ class StubRunnerPlugin implements Plugin<Project> {
     @PackageScope static final String MOCK_DEPS_CONFIGURATION_NAME = 'mockDependencies'
     @PackageScope static final String MICROSERVICE_GROUP_NAME = 'microservice'
     @PackageScope static final String WRONG_PARAMS_EXCEPTION_MESSAGE = 'You have to provide all parameters of the command!'
-    @PackageScope static final String MICRO_DEPS_GROUP_NAME = 'com.ofg'
-    @PackageScope static final String MICRO_DEPS_ARTIFACT_NAME = 'micro-deps'
-    @PackageScope static final String FAT_JAR_SUFFIX = 'fatJar'
     private static final int OK_PROCESS_EXIT_VALUE = 0
 
     private final LoggerProxy loggerProxy
@@ -84,7 +81,7 @@ class StubRunnerPlugin implements Plugin<Project> {
             File microserviceMetadata = configurationFinder.findMicroserviceMetaData(project)
             String microDepsFatJarName = dependenciesFinder.getMicroDepsFatJarName(project)
             GString runMocksCommand = "java -jar $microDepsFatJarName -p $zookeperPort -mp $serviceStoppingPort -f ${microserviceMetadata?.absolutePath} -r $stubRepositoryUrl"
-            task.logger.info("Executing command [$runMocksCommand]")
+            println "Executing command [$runMocksCommand]"
             if (runMocksCommand.values.contains(null)) {
                 task.logger.error(WRONG_PARAMS_EXCEPTION_MESSAGE)
                 throw new WrongMicroDepsExecutionParams("$WRONG_PARAMS_EXCEPTION_MESSAGE Your command looked like this [$runMocksCommand]")
@@ -103,9 +100,9 @@ class StubRunnerPlugin implements Plugin<Project> {
         Task createdTask = project.task(STOP_MOCKS_TASK_NAME) << { Task task ->
             Integer zookeperPort = project.extensions.stubRunner.zookeeperPort
             String stopMocksUrl = "http://localhost:$zookeperPort/stop"
-            task.logger.info("Stopping mocks by calling $stopMocksUrl")
+            println "Stopping mocks by calling $stopMocksUrl"
             new HTTPBuilder(stopMocksUrl).get([:])
-            task.logger.info("Mocks stopped successfully")
+            println "Mocks st   opped successfully"
         }
         createdTask.group = MICROSERVICE_GROUP_NAME
         createdTask.description = 'Sends a request to the started micro-deps server to stop all executed stubs, zookeeper instance and itself'
