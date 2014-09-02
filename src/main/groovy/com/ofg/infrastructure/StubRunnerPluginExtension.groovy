@@ -8,18 +8,19 @@ class StubRunnerPluginExtension {
     public static final String LATEST_VERSION = '+'
 
     /**
-     * Version of the micro-deps dependency {@see <a href="https://github.com/4finance/micro-deps">Micro Deps on Github</a>} 
+     * Version of the micro-deps dependency
+     *
+     * @see <a href="https://github.com/4finance/micro-deps">micro-deps on Github</a>
      */
     String microDepsVersion = LATEST_VERSION
 
     /**
-     * Port at which Zookeeper will set itself up. The default is {@see StubRunnerPluginExtension.DEFAULT_ZOOKEEPER_PORT}
+     * Port at which Zookeeper will set itself up
      */
     Integer zookeeperPort = DEFAULT_ZOOKEEPER_PORT
 
     /**
-     * Port at which {@see <a href="https://github.com/4finance/micro-deps">micro-deps'</a>} 
-     * running process listens to POST requests to stop itself 
+     * Port at which micro-deps running process listens to POST requests to stop itself
      */
     Integer serviceStoppingPort = DEFAULT_SERVICE_STOPPING_PORT
 
